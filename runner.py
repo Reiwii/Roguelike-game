@@ -19,13 +19,16 @@ dt = 0
 
 camera = Camera.Camera()
 player = Player.Player(camera)
+enemy = Enemy.Enemy(player)
+camera.add(enemy)
+
 for i in range(100):
     x= random.randint(-4000,4000)
     y= random.randint(0,1000)
     tree = Tree.Tree((x,y),camera)
     
+enemies_group = pygame.sprite.Group()
 
-enemies_group = pygame.sprite.Group(Enemy.Enemy((100,100)))
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 
@@ -33,15 +36,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
-    screen.fill("purple")
-
-    camera.update()
+    player.update()
+    for sprite in camera.sprites():
+        if hasattr(sprite, 'update') and sprite != player:
+            sprite.update(player)
     camera.custom_draw(player)
-    enemies_group.update()
-    enemies_group.draw(screen)
-
-
     pygame.display.flip()
     dt = clock.tick(60) / 1000
 
