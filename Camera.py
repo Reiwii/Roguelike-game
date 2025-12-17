@@ -7,8 +7,6 @@ class Camera(pygame.sprite.Group):
         self.display_surface =  pygame.display.get_surface()
         self.screen_width = self.display_surface.get_size()[0]
         self.screen_height = self.display_surface.get_size()[1]
-
-        #offset
         self.offset = pygame.math.Vector2()
 
         self.camera_borders = {'left': 200, 'right': 200, 'top': 100, 'bottom': 100}
@@ -18,8 +16,7 @@ class Camera(pygame.sprite.Group):
         h = self.screen_height - (self.camera_borders['top'] + self.camera_borders['bottom'])
         self.camera_rect = pygame.Rect(l,t,w,h)
 
-        #ground
-        ground_surf = pygame.image.load('map.png').convert_alpha()
+        ground_surf = pygame.image.load('assets/map.png').convert_alpha()
         self.ground_surf = pygame.transform.scale_by(ground_surf,3)
         self.ground_rect = self.ground_surf.get_rect()
         self.ground_width = self.ground_rect.width

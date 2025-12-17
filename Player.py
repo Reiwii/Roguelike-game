@@ -2,9 +2,9 @@ import pygame
 import pygame.sprite as sprite
 
 class Player(sprite.Sprite):
-    def __init__(self,group):
+    def __init__(self,group:sprite.Group):
         super().__init__(group)
-        image = pygame.image.load("tile_0098.png").convert_alpha()
+        image = pygame.image.load("assets/tile_0098.png").convert_alpha()
         self.image=pygame.transform.scale_by(image,3)
         self.rect = self.image.get_rect(topleft=(500,550))
         self.mov_speed = 4
