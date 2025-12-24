@@ -1,7 +1,6 @@
 import pygame
 import pygame.sprite as sprite
 import World
-from sympy import Integer
 from dataclasses import dataclass
 from weapons.Base import BaseWeapon
 
@@ -21,8 +20,9 @@ class Player(sprite.Sprite):
         image = pygame.image.load("assets/tile_0098.png").convert_alpha()
         self.image=pygame.transform.scale_by(image,3)
         self.pos = pygame.math.Vector2(500,500)
-        self.rect = self.image.get_rect(topleft=self.pos.xy)
-        self.speed = 2
+        self.rect = self.image.get_rect(center=self.pos)
+        self.radius = 10 
+        self.speed = 2 
 
         self.combat_stats = PlayerCombatStats()
         self.weapons: list[BaseWeapon] = [] 
@@ -41,8 +41,8 @@ class Player(sprite.Sprite):
         if input_vector.length() > 0:
             input_vector = input_vector.normalize()
             
-        self.pos.x += input_vector.x * self.speed
-        self.pos.y += input_vector.y * self.speed
+        self.pos.x += input_vector.x * self.speed 
+        self.pos.y += input_vector.y * self.speed 
         self.rect.centerx = round(self.pos.x)
         self.rect.centery = round(self.pos.y)
 
