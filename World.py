@@ -7,6 +7,7 @@ import Camera
 import Tree
 import math
 import Projectile
+from collections import defaultdict
 
 class World:
     def __init__(self, screen, player, camera_group,
@@ -23,29 +24,62 @@ class World:
         self.start_time = pygame.time.get_ticks()
         self.last_spawn_time = self.start_time
         self.enemies_killed = 0
+        self.max_enemies = 300
+        self.current_enemies = 0
 
-        self.base_spawn_interval = 1000   
-        self.min_spawn_interval  = 250    
+        self.base_spawn_interval = 2000   
+        self.min_spawn_interval  = 1000    
         self.margin              = 150    
 
-
-        # trees
         for i in range(100):
             x = random.randint(-4000, 4000)
             y = random.randint(0, 1000)
             tree = Tree.Tree((x, y), self.camera_group)
+        
+        
+        self.cell_size = 12
+        self.enemy_grid = defaultdict(list)
+
+    def rebuild_enemy_grid(self):
+        self.enemy_grid.clear()
+        cs = self.cell_size
+        for e in self.enemies_group:
+            self.enemy_grid[(int(e.pos.x // cs), int(e.pos.y // cs))].append(e)
+
+    def resolve_enemy_collisions(self):
+        for (cx, cy), enemies in self.enemy_grid.items():
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    neighbors = self.enemy_grid.get((cx + dx, cy + dy), [])
+                    for a in enemies:
+                        for b in neighbors:
+                            if a is b or id(a) >= id(b):
+                                continue
+                            delta = a.pos - b.pos
+                            d2 = delta.length_squared()
+                            if d2 == 0:
+                                continue
+                            min_dist = a.radius + b.radius
+                            if d2 < min_dist * min_dist:
+                                dist = d2 ** 0.5
+                                overlap = (min_dist - dist)
+                                push = overlap * 0.2      
+                                delta.scale_to_length(push * 0.5)
+                                a.pos += delta
+                                b.pos -= delta
+
 
     def register_enemy_kill(self):
         self.enemies_killed += 1
 
     def get_spawn_interval_ms(self):
         elapsed = (pygame.time.get_ticks() - self.start_time) / 1000.0
-        difficulty = 1.0 + elapsed * 0.02 + self.enemies_killed * 0.03
+        difficulty = 1.0 + elapsed * 0.01 + self.enemies_killed * 0.02
         interval = self.base_spawn_interval / difficulty
         return max(interval, self.min_spawn_interval)
 
     def get_batch_size(self):
-        return 10 + self.enemies_killed // 10
+        return 20 + self.enemies_killed // 20
 
     def random_pos_outside_camera(self, camera):
         angle = random.random() * 2 * math.pi          
@@ -58,6 +92,9 @@ class World:
 
 
     def spawn_enemies(self, camera):
+        if self.max_enemies <= self.current_enemies:
+            return
+
         now = pygame.time.get_ticks()
         interval = self.get_spawn_interval_ms()
         if now - self.last_spawn_time < interval:
@@ -65,6 +102,7 @@ class World:
 
         self.last_spawn_time = now
         batch = self.get_batch_size()
+        self.current_enemies += batch
         for _ in range(batch):
             x, y = self.random_pos_outside_camera(camera)
             Enemy.Enemy((x, y), self.camera_group,
@@ -73,6 +111,12 @@ class World:
     def update(self, dt, camera):
         self.all_sprites_group.update(self, dt)
         self.spawn_enemies(camera)
+        print(self.current_enemies)
+        self.rebuild_enemy_grid()
+        self.resolve_enemy_collisions()
+
+
+
 
     def spawn_projectile(self, pos, vel, damage, pierce, owner):
         Projectile.Projectile(
