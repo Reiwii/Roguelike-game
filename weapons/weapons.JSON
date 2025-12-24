@@ -2,7 +2,7 @@
   "magic_wand": {
     "name": "Magic Wand",
     "levels": [
-      { "damage": 100, "cooldown": 1.00, "amount": 1, "speed": 450, "pierce": 3 },
+      { "damage": 10, "cooldown": 1.00, "amount": 1, "speed": 450, "pierce": 3 },
       { "damage": 12, "cooldown": 0.95, "amount": 1, "speed": 470, "pierce": 0 },
       { "damage": 14, "cooldown": 0.90, "amount": 2, "speed": 470, "pierce": 0 }
     ],
