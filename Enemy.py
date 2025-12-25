@@ -3,10 +3,11 @@ import pygame
 import World
 import weapons.Base as Base
 from dataclasses import dataclass
+import ExpGem
+from Chest import Chest
 
 @dataclass
 class EnemyStats:
-    max_hp: int 
     hp: int
     damage: int
     speed: int
@@ -15,12 +16,19 @@ class Enemy(sprite.Sprite):
     sheet = None
     frames = None
     animations = None
-    def __init__(self,pos,*groups:list[pygame.sprite.Group]):
+    def __init__(self,pos,is_boss,*groups:list[pygame.sprite.Group]):
         super().__init__(*groups)
     
         # combat stats 
-        self.stats = EnemyStats(100,100,10,1)
-        self.dead = False
+        self.is_boss=is_boss
+        if self.is_boss:
+            self.stats = EnemyStats(10,10,1)
+            self.radius = 32
+            self.scale = 2
+        else:
+            self.stats = EnemyStats(20,10,1)
+            self.radius = 16
+            self.scale = 1
 
         self.load_animations()
         self.action = 'walk_side_left' 
@@ -28,7 +36,6 @@ class Enemy(sprite.Sprite):
         self.pos = pygame.math.Vector2(pos)
         self.image = self.animations[self.action][self.frame_index]
         self.rect = self.image.get_rect(center=self.pos)
-        self.radius = 16
         self.frame_count = 0;
         self.animation_speed = 0.05;
 
@@ -100,7 +107,8 @@ class Enemy(sprite.Sprite):
                 self.kill()
                 return
             self.frame_index = 0
-        self.image = animation_list[self.frame_index]
+        frame = animation_list[self.frame_index]
+        self.image = pygame.transform.scale_by(frame,self.scale)
 
 
 
@@ -120,3 +128,10 @@ class Enemy(sprite.Sprite):
             self.action = "die"
             self.frame_index = 0
             self.frame_count = 0 
+
+            if self.is_boss:
+                Chest(self.pos, world.chest_group, world.all_sprites_group, world.camera_group)
+            else:
+                ExpGem.ExpGem(self.pos,world.exp_orb_group,world.all_sprites_group,world.camera_group)
+
+

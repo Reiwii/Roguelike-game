@@ -26,6 +26,9 @@ class Player(sprite.Sprite):
 
         self.combat_stats = PlayerCombatStats()
         self.weapons: list[BaseWeapon] = [] 
+        self.xp = 0
+        self.level = 1
+        self.xp_to_next_level = 10
 
     def update(self,world:World,dt):
         input_vector = pygame.math.Vector2(0, 0)
@@ -48,3 +51,11 @@ class Player(sprite.Sprite):
 
         for w in self.weapons:
             w.update(dt, world, self)
+        
+    def add_xp(self,value):
+        self.xp += value
+        if self.xp >= self.xp_to_next_level:
+            self.xp = 0
+            self.xp_to_next_level += 100
+            self.level +=1
+            
