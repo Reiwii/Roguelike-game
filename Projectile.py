@@ -31,7 +31,7 @@ class Projectile(pygame.sprite.Sprite):
             if e in self.enemies_hit:
                 continue
             self.enemies_hit.add(e)
-            e.take_damage(self.damage,world)
+            e.take_damage(self.damage,world,world.player.pos)
             self.pierce -= 1
             if self.pierce == 0:
                 self.kill()

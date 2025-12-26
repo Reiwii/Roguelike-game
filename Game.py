@@ -4,6 +4,7 @@ import Camera
 import Player
 import World
 from weapons.weapons_from_json import load_weapon_db,create_weapon
+import UI
 class Game():
     def __init__(self):
         pygame.init()
@@ -27,18 +28,22 @@ class Game():
         weapon_db = load_weapon_db("weapons/weapons.JSON")
         magic_wand = create_weapon("magic_wand", weapon_db)
         self.player.weapons.append(magic_wand)
+        self.ui = UI.UI(self.screen,self.world)
 
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            self.ui.handle_event(event)
 
     def update(self):
         self.world.update(self.dt, self.camera)
 
     def draw(self):
         self.camera.custom_draw(self.player)
+        self.ui.draw()
         pygame.display.flip()
+
     def run(self):
         while self.running:
             self.handle_events()
