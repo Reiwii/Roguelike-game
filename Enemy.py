@@ -38,6 +38,10 @@ class Enemy(sprite.Sprite):
         self.rect = self.image.get_rect(center=self.pos)
         self.frame_count = 0;
         self.animation_speed = 0.05;
+        self.knockback = pygame.math.Vector2()
+        self.knockback_decay = 5     
+        self.max_knockback = 450
+
 
         
     @classmethod
@@ -88,6 +92,12 @@ class Enemy(sprite.Sprite):
             self.pos.x += direction_vector.x * self.stats.speed 
             self.pos.y += direction_vector.y * self.stats.speed 
 
+        self.pos += self.knockback * dt
+        self.knockback -= self.knockback * self.knockback_decay * dt
+        if self.knockback.length_squared() < 1:
+            self.knockback.update(0, 0)
+
+
         self.rect.centerx = round(self.pos.x)
         self.rect.centery = round(self.pos.y)
         self.animate()
@@ -117,21 +127,30 @@ class Enemy(sprite.Sprite):
         return None
 
 
-    def take_damage(self, amount: int,world):
-        if self.action=="die":
+    def take_damage(self, amount: int, world, source_pos, knockback=250):
+        if self.action == "die":
             return
+
         self.stats.hp -= amount
+
+        if source_pos is not None:
+            d = self.pos - pygame.math.Vector2(source_pos)
+            if d.length_squared() > 0:
+                d = d.normalize()
+                self.knockback += d * knockback
+                if self.knockback.length() > self.max_knockback:
+                    self.knockback.scale_to_length(self.max_knockback)
+
         if self.stats.hp <= 0:
             world.register_enemy_kill()
             world.current_enemies -= 1
             self.stats.hp = 0
             self.action = "die"
             self.frame_index = 0
-            self.frame_count = 0 
+            self.frame_count = 0
 
             if self.is_boss:
                 Chest(self.pos, world.chest_group, world.all_sprites_group, world.camera_group)
             else:
-                ExpGem.ExpGem(self.pos,world.exp_orb_group,world.all_sprites_group,world.camera_group)
-
+                ExpGem.ExpGem(self.pos, world.exp_orb_group, world.all_sprites_group, world.camera_group)
 

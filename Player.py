@@ -23,12 +23,17 @@ class Player(sprite.Sprite):
         self.rect = self.image.get_rect(center=self.pos)
         self.radius = 10 
         self.speed = 2 
+        self.hp = 100
+        self.max_hp = 100
 
         self.combat_stats = PlayerCombatStats()
         self.weapons: list[BaseWeapon] = [] 
         self.xp = 0
         self.level = 1
         self.xp_to_next_level = 10
+        self.last_hit_ms = 0
+        self.hit_cooldown_ms = 500  
+
 
     def update(self,world:World,dt):
         input_vector = pygame.math.Vector2(0, 0)
@@ -59,3 +64,11 @@ class Player(sprite.Sprite):
             self.xp_to_next_level += 100
             self.level +=1
             
+    def take_damage(self, amount: int):
+        now = pygame.time.get_ticks()
+        if now - self.last_hit_ms < self.hit_cooldown_ms:
+            return
+        self.last_hit_ms = now
+        self.hp = max(0, self.hp - amount)
+        if self.hp == 0:
+            print("die")

@@ -136,6 +136,17 @@ class World:
             self.open_chest()
 
 
+        #PLAYER ENEMY COL
+        hits = pygame.sprite.spritecollide(
+            self.player,
+            self.enemies_group,
+            dokill=False,
+            collided=pygame.sprite.collide_circle)
+
+        for e in hits:
+            self.player.take_damage(e.stats.damage)
+            e.take_damage(0,self,self.player.pos)
+
 
 
     def spawn_projectile(self, pos, vel, damage, pierce, owner):
