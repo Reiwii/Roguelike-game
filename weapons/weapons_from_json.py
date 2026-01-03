@@ -2,10 +2,15 @@ import json
 from .Base import WeaponLevelStats
 from .MagicWand import MagicWandWeapon
 from .Sword import Sword
+from .crossbow import CrossbowWeapon
+from .Shuriken import Shuriken
+
 
 WEAPON_CLASSES = {
     "magic_wand": MagicWandWeapon,
-    "sword":Sword
+    "sword":Sword,
+    "crossbow":CrossbowWeapon,
+    "shuriken":Shuriken
 }
 
 def load_weapon_db(path: str) -> dict:

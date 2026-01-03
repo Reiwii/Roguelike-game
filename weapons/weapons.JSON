@@ -12,19 +12,19 @@
   "shuriken": {
     "name": "Shuriken",
     "levels": [
-      { "damage": 8,  "cooldown": 0.80, "amount": 1, "speed": 550, "pierce": 1 },
-      { "damage": 10, "cooldown": 0.75, "amount": 2, "speed": 570, "pierce": 1 },
-      { "damage": 13, "cooldown": 0.70, "amount": 3, "speed": 600, "pierce": 2 }
+      { "damage": 8,  "cooldown": 0.80, "amount": 1, "speed": 550, "pierce": 4 },
+      { "damage": 10, "cooldown": 0.75, "amount": 2, "speed": 570, "pierce": 4 },
+      { "damage": 13, "cooldown": 0.70, "amount": 3, "speed": 600, "pierce": 4 }
     ],
     "evolution": { "required_passive_id": "dagger_scroll", "evolved_weapon_id": "shadow_shuriken" }
   },
 
-  "fire_wand": {
-    "name": "crossbow",
+  "crossbow": {
+    "name": "Crossbow",
     "levels": [
-      { "damage": 20, "cooldown": 1.30, "amount": 1, "speed": 380, "pierce": 0 },
-      { "damage": 24, "cooldown": 1.20, "amount": 1, "speed": 400, "pierce": 0 },
-      { "damage": 28, "cooldown": 1.10, "amount": 2, "speed": 420, "pierce": 1 }
+      { "damage": 20, "cooldown": 1.30, "amount": 1, "speed": 380, "pierce": 4 },
+      { "damage": 24, "cooldown": 1.20, "amount": 1, "speed": 400, "pierce": 5 },
+      { "damage": 28, "cooldown": 1.10, "amount": 2, "speed": 420, "pierce": 6 }
     ],
     "evolution": { "required_passive_id": "spinach", "evolved_weapon_id": "inferno_wand" }
   },

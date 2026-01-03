@@ -52,8 +52,8 @@ class BaseWeapon:
         )
 
     def update(self, dt: float, world, owner) -> None:
-        self._cooldown_timer = max(0.0, self._cooldown_timer - dt)
-        if self._cooldown_timer == 0.0:
+        self._cooldown_timer -= dt
+        if self._cooldown_timer <= 0.0:
             self.fire(world, owner)
             self._cooldown_timer = self.final_stats(owner.combat_stats).cooldown
 

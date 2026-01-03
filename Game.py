@@ -25,7 +25,7 @@ class Game():
                                  self.enemies_group,self.all_sprites_group,
                                  self.projectile_group,self.exp_orb_group,
                                  self.chest_group)
-        sword = create_weapon("sword", self.world.weapon_db)
+        sword = create_weapon("shuriken", self.world.weapon_db)
         self.player.weapons.append(sword)
 
         self.ui = UI.UI(self.screen,self.world)

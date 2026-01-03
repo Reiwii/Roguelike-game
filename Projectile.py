@@ -39,7 +39,16 @@ class DamageHitbox(pygame.sprite.Sprite):
 class LinearProjectile(DamageHitbox):
     def __init__(self, pos, vel, damage, pierce, owner, image, radius=3, *groups):
         self.vel = pygame.Vector2(vel)
+
+        self.original_image = image
         super().__init__(pos, damage, pierce, owner, radius, image, *groups)
+
+
+        if self.vel.length_squared() > 0:
+            angle = self.vel.angle_to(pygame.math.Vector2(1,0)) - 45
+            self.image = pygame.transform.rotate(self.original_image, angle)
+            self.rect = self.image.get_rect(center=self.rect.center)
+
 
     def update(self, world, dt):
         if not world.despawn_rect.colliderect(self.rect):
@@ -49,9 +58,10 @@ class LinearProjectile(DamageHitbox):
         self.pos += self.vel * dt
         self.rect.center = (round(self.pos.x), round(self.pos.y))
         self.handle_hits(world)
+        
 
 
-class FollowOwnerHitbox(DamageHitbox):
+class SlashHitbox(DamageHitbox):
     def __init__(self, owner, damage, pierce, radius, image, lifetime, *groups):
         super().__init__(owner.rect.center, damage, pierce, owner, radius, image, *groups)
         self.lifetime = lifetime
@@ -65,3 +75,37 @@ class FollowOwnerHitbox(DamageHitbox):
         self.lifetime -= dt
         if self.lifetime <= 0:
             self.kill()
+class ShurikenProjectile(DamageHitbox):
+    def __init__(self, pos, vel, damage, pierce, owner, image, radius=6, *groups):
+        self.vel = pygame.Vector2(vel)
+        super().__init__(pos, damage, pierce, owner, radius, image, *groups)
+
+    def on_hit_enemy(self, world, enemy):
+        enemy.take_damage(self.damage, world, world.player.pos)
+        self.vel *= -1
+        self.enemies_hit.clear()
+
+    def handle_hits(self, world):
+        hits = pygame.sprite.spritecollide(
+            self, world.enemies_group, False, collided=pygame.sprite.collide_circle
+        )
+        for e in hits:
+            if e.action == "die" or e in self.enemies_hit:
+                continue
+
+            self.enemies_hit.add(e)
+            self.on_hit_enemy(world, e)
+
+            self.pierce -= 1
+            if self.pierce <= 0:
+                self.kill()
+            break  
+
+    def update(self, world, dt):
+        if not world.despawn_rect.colliderect(self.rect):
+            self.kill()
+            return
+
+        self.pos += self.vel * dt
+        self.rect.center = (round(self.pos.x), round(self.pos.y))
+        self.handle_hits(world)

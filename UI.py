@@ -21,6 +21,7 @@ class UI:
         self.weapon_icons = {
             "magic_wand": self.world.assets["magic_wand"],
             "sword": self.world.assets["sword"],
+            "crossbow": self.world.assets["crossbow"]
         }
 
         self.attribute_icons = {

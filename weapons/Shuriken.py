@@ -1,9 +1,9 @@
 import math
 from .Base import BaseWeapon, WeaponLevelStats
 
-class CrossbowWeapon(BaseWeapon):
-    id = "crossbow"
-    name = "Crossbow"
+class Shuriken(BaseWeapon):
+    id = "shuriken"
+    name = "Shuriken"
 
     def __init__(self, level_stats: list[WeaponLevelStats]):
         super().__init__(level_stats)
@@ -39,5 +39,5 @@ class CrossbowWeapon(BaseWeapon):
                 pierce=stats.pierce,
                 owner=owner,
                 radius=0,
-                projectile_id ="arrow"
+                projectile_id ="shuriken"
             )

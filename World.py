@@ -6,7 +6,7 @@ import Enemy
 import Camera
 import Tree
 import math
-from Projectile import LinearProjectile,FollowOwnerHitbox
+from Projectile import LinearProjectile,SlashHitbox,ShurikenProjectile
 from collections import defaultdict
 from weapons.weapons_from_json import load_weapon_db, create_weapon
 
@@ -48,12 +48,17 @@ class World:
 
         self.weapon_db = load_weapon_db("weapons/weapons.JSON")
         self.all_weapon_ids = list(self.weapon_db.keys())
+
         #load images
         self.assets = {}
         self.assets["magic_wand"] = self.load_image("assets/weapons/magic_wand/magic_wand.png",1.5)
         self.assets["sword"] = self.load_image("assets/weapons/sword/sword.png",1.5)
+        self.assets["crossbow"] = self.load_image("assets/weapons/crossbow/crossbow.png",1.5)
+        self.assets["shuriken"] = self.load_image("assets/weapons/shuriken/shuriken.png",1.5)
         self.anims = {}
         self.anims["sword"] = self.load_image("assets/weapons/sword/projectile/slash6.png",)
+        self.anims["arrow"] = self.load_image("assets/weapons/crossbow/arrow.png")
+        self.anims["shuriken"] = self.load_image("assets/weapons/shuriken/shuriken.png",1.5)
         
 
     def rebuild_enemy_grid(self):
@@ -168,14 +173,19 @@ class World:
 
 
 
-    def spawn_projectile(self,  projectile_id, pos, vel=(0,0), damage=1, pierce=1, owner=None, radius=3, lifetime=0.1):
-        if projectile_id == "bullet":
-            img = self.assets["bullet"]  
+    def spawn_projectile(self,  projectile_id, pos, vel=(0,0), damage=1, pierce=1, owner=None, radius=3, lifetime=0.1,bounces=0):
+        if projectile_id == "arrow":
+            img = self.anims["arrow"]  
             LinearProjectile(pos, vel, damage, pierce, owner, img, radius, self.projectile_group, self.all_sprites_group, self.camera_group)
 
         elif projectile_id == "slash":
             img = self.anims["sword"]  
-            FollowOwnerHitbox(owner, damage, pierce, radius, img, lifetime, self.projectile_group, self.all_sprites_group, self.camera_group)
+            SlashHitbox(owner, damage, pierce, radius, img, lifetime, self.projectile_group, self.all_sprites_group, self.camera_group)
+        elif projectile_id == "shuriken":
+            img = self.assets["shuriken"]
+            ShurikenProjectile(pos, vel, damage, pierce, owner, img, radius,
+                      self.projectile_group, self.all_sprites_group, self.camera_group)
+
 
 
     def open_chest(self):
