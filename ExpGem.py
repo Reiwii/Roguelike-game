@@ -5,6 +5,5 @@ class ExpGem(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.value = 1
         self.pos = pos
-        self.image = pygame.Surface((8, 8), pygame.SRCALPHA)
-        self.image.fill((0, 255, 255))
+        self.image = pygame.image.load("assets/exp_orb.png")
         self.rect = self.image.get_rect(center=self.pos)

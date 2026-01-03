@@ -7,9 +7,8 @@ class Chest(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.pos = pygame.math.Vector2(pos)
 
-        self.image = pygame.Surface((24, 18), pygame.SRCALPHA)
-        self.image.fill((180, 120, 40))
-        pygame.draw.rect(self.image, (80, 50, 20), self.image.get_rect(), 2)
+        image = pygame.image.load("assets/chest.png")
+        self.image = pygame.transform.scale_by(image,2)
 
         self.rect = self.image.get_rect(center=self.pos)
 

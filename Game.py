@@ -12,7 +12,7 @@ class Game():
         pygame.display.set_caption("Camera Movement Example")
         self.clock = pygame.time.Clock()
         self.running = True
-        self.dt = 0
+        self.dt = -1
         self.enemies_group = pygame.sprite.Group()
         self.projectile_group = pygame.sprite.Group()
         self.all_sprites_group = pygame.sprite.Group()
@@ -25,9 +25,9 @@ class Game():
                                  self.enemies_group,self.all_sprites_group,
                                  self.projectile_group,self.exp_orb_group,
                                  self.chest_group)
-        weapon_db = load_weapon_db("weapons/weapons.JSON")
-        magic_wand = create_weapon("magic_wand", weapon_db)
-        self.player.weapons.append(magic_wand)
+        sword = create_weapon("sword", self.world.weapon_db)
+        self.player.weapons.append(sword)
+
         self.ui = UI.UI(self.screen,self.world)
 
     def handle_events(self):
@@ -37,7 +37,11 @@ class Game():
             self.ui.handle_event(event)
 
     def update(self):
-        self.world.update(self.dt, self.camera)
+        if not self.ui.paused:
+            self.world.update(self.dt, self.camera)
+        # if self.world.player.leveled_up:
+        #     self.world.player.leveled_up = False
+        #     self.ui.open_levelup_choices()
 
     def draw(self):
         self.camera.custom_draw(self.player)
@@ -49,7 +53,7 @@ class Game():
             self.handle_events()
             self.update()
             self.draw()
-            self.dt = self.clock.tick(60) / 1000
+            self.dt = self.clock.tick(59) / 1000
 
         pygame.quit()
 
