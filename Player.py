@@ -28,8 +28,10 @@ class Player(sprite.Sprite):
 
         self.combat_stats = PlayerCombatStats()
         self.weapons: list[BaseWeapon] = [] 
+        self.attributes = []
         self.xp = 0
         self.level = 1
+        self.leveled_up = False
         self.xp_to_next_level = 10
         self.last_hit_ms = 0
         self.hit_cooldown_ms = 500  
@@ -63,6 +65,8 @@ class Player(sprite.Sprite):
             self.xp = 0
             self.xp_to_next_level += 100
             self.level +=1
+            self.leveled_up = True
+
             
     def take_damage(self, amount: int):
         now = pygame.time.get_ticks()

@@ -6,8 +6,9 @@ import Enemy
 import Camera
 import Tree
 import math
-import Projectile
+from Projectile import LinearProjectile,FollowOwnerHitbox
 from collections import defaultdict
+from weapons.weapons_from_json import load_weapon_db, create_weapon
 
 class World:
     def __init__(self, screen, player, camera_group,
@@ -22,6 +23,8 @@ class World:
         self.chest_group = chest_group
 
         self.player = player
+        self.despawn_rect = pygame.Rect(self.player.pos.x,self.player.pos.y,self.screen.get_size()[0],self.screen.get_size()[1])
+        self.despawn_rect.inflate_ip(500,500)
 
         self.start_time = pygame.time.get_ticks()
         self.last_spawn_time = self.start_time
@@ -42,6 +45,16 @@ class World:
         
         self.cell_size = 12
         self.enemy_grid = defaultdict(list)
+
+        self.weapon_db = load_weapon_db("weapons/weapons.JSON")
+        self.all_weapon_ids = list(self.weapon_db.keys())
+        #load images
+        self.assets = {}
+        self.assets["magic_wand"] = self.load_image("assets/weapons/magic_wand/magic_wand.png",1.5)
+        self.assets["sword"] = self.load_image("assets/weapons/sword/sword.png",1.5)
+        self.anims = {}
+        self.anims["sword"] = self.load_image("assets/weapons/sword/projectile/slash6.png",)
+        
 
     def rebuild_enemy_grid(self):
         self.enemy_grid.clear()
@@ -118,6 +131,7 @@ class World:
                         self.enemies_group, self.all_sprites_group)
 
     def update(self, dt, camera):
+        self.despawn_rect.center = self.player.pos
         self.all_sprites_group.update(self, dt)
         self.spawn_enemies(camera)
         self.rebuild_enemy_grid()
@@ -130,7 +144,6 @@ class World:
             gem.kill()
 
         #chest 
-        # after sprites update
         opened = pygame.sprite.spritecollide(self.player, self.chest_group, dokill=True)
         for chest in opened:
             self.open_chest()
@@ -147,13 +160,23 @@ class World:
             self.player.take_damage(e.stats.damage)
             e.take_damage(0,self,self.player.pos)
 
+        for e in self.enemies_group:
+            if not self.despawn_rect.colliderect(e.rect):
+                x, y = self.random_pos_outside_camera(camera)
+                e.pos.update(x, y)
+                e.rect.center = (int(x), int(y))
 
 
-    def spawn_projectile(self, pos, vel, damage, pierce, owner):
-        Projectile.Projectile(
-            pos,vel,damage,pierce,owner,
-            self.projectile_group, self.all_sprites_group, self.camera_group
-        )
+
+    def spawn_projectile(self,  projectile_id, pos, vel=(0,0), damage=1, pierce=1, owner=None, radius=3, lifetime=0.1):
+        if projectile_id == "bullet":
+            img = self.assets["bullet"]  
+            LinearProjectile(pos, vel, damage, pierce, owner, img, radius, self.projectile_group, self.all_sprites_group, self.camera_group)
+
+        elif projectile_id == "slash":
+            img = self.anims["sword"]  
+            FollowOwnerHitbox(owner, damage, pierce, radius, img, lifetime, self.projectile_group, self.all_sprites_group, self.camera_group)
+
 
     def open_chest(self):
         upgradable = [w for w in self.player.weapons if w.can_level_up()]
@@ -161,3 +184,9 @@ class World:
             return
         w = random.choice(upgradable)
         w.level_up()
+
+    def load_image(self,path, scale=None):
+        img = pygame.image.load(path).convert_alpha()
+        if scale:
+            img = pygame.transform.scale_by(img, scale)
+        return img

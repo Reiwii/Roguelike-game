@@ -102,6 +102,7 @@ class Enemy(sprite.Sprite):
         self.rect.centery = round(self.pos.y)
         self.animate()
 
+
     
     
     def animate(self):

@@ -1,39 +1,67 @@
 import pygame
 
-class Projectile(pygame.sprite.Sprite):
-    def __init__(self, pos, vel, damage, pierce, owner, *groups):
+class DamageHitbox(pygame.sprite.Sprite):
+    def __init__(self, pos, damage, pierce, owner, radius, image, *groups):
         super().__init__(*groups)
-        self.pos = pygame.math.Vector2(pos)
-        self.vel = pygame.math.Vector2(vel)
-        self.damage = damage
-        self.pierce = pierce
         self.owner = owner
-        self.radius = 3
-        self.pierce = 2
-        self.enemies_hit: set[pygame.sprite.Sprite] = set()
-        self.lifetime = 1.0
-        self.age = 0
+        self.pos = pygame.Vector2(pos)
 
-        self.image = pygame.Surface((8, 8), pygame.SRCALPHA)
-        self.image.fill((255, 255, 0))
-        self.rect = self.image.get_rect(center=self.pos)
+        self.damage = damage
+        self.pierce = pierce          #-1 inf
+        self.radius = radius          
+        self.enemies_hit = set()
 
-    def update(self, world, dt):
-        self.age += dt
-        if self.age > self.lifetime:
-            self.kill()
-        self.pos += self.vel * dt
-        self.rect.center = (round(self.pos.x), round(self.pos.y))
+        self.image = image
+        self.rect = self.image.get_rect(center=(round(self.pos.x), round(self.pos.y)))
 
-        hits = pygame.sprite.spritecollide(self, world.enemies_group, False,collided=pygame.sprite.collide_circle)
+    def on_hit_enemy(self, world, enemy):
+        enemy.take_damage(self.damage, world, world.player.pos)
 
+    def handle_hits(self, world):
+        hits = pygame.sprite.spritecollide(self, world.enemies_group, False, collided=pygame.sprite.collide_circle)
         for e in hits:
+            if e.action  == "die":
+                continue
             if e in self.enemies_hit:
                 continue
+
             self.enemies_hit.add(e)
-            e.take_damage(self.damage,world,world.player.pos)
+            self.on_hit_enemy(world, e)
+
+            if self.pierce == -1:
+                continue
             self.pierce -= 1
-            if self.pierce == 0:
+            if self.pierce <= 0:
                 self.kill()
                 break
 
+
+class LinearProjectile(DamageHitbox):
+    def __init__(self, pos, vel, damage, pierce, owner, image, radius=3, *groups):
+        self.vel = pygame.Vector2(vel)
+        super().__init__(pos, damage, pierce, owner, radius, image, *groups)
+
+    def update(self, world, dt):
+        if not world.despawn_rect.colliderect(self.rect):
+            self.kill()
+            return
+
+        self.pos += self.vel * dt
+        self.rect.center = (round(self.pos.x), round(self.pos.y))
+        self.handle_hits(world)
+
+
+class FollowOwnerHitbox(DamageHitbox):
+    def __init__(self, owner, damage, pierce, radius, image, lifetime, *groups):
+        super().__init__(owner.rect.center, damage, pierce, owner, radius, image, *groups)
+        self.lifetime = lifetime
+
+    def update(self, world, dt):
+        self.pos.update(self.owner.rect.center)
+        self.rect.center = (round(self.pos.x), round(self.pos.y))
+
+        self.handle_hits(world)
+
+        self.lifetime -= dt
+        if self.lifetime <= 0:
+            self.kill()

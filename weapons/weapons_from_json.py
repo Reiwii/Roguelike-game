@@ -1,9 +1,11 @@
 import json
 from .Base import WeaponLevelStats
 from .MagicWand import MagicWandWeapon
+from .Sword import Sword
 
 WEAPON_CLASSES = {
     "magic_wand": MagicWandWeapon,
+    "sword":Sword
 }
 
 def load_weapon_db(path: str) -> dict:
