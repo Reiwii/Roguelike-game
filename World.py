@@ -1,4 +1,4 @@
-# World.py
+from numpy import concat
 import pygame
 import random
 import Player
@@ -21,6 +21,11 @@ class World:
         self.camera_group = camera_group
         self.exp_orb_group = exp_orb_group
         self.chest_group = chest_group
+        self.map_top = 0
+        self.map_bottom = self.camera_group.ground_rect.height 
+        self.player_padding_top_y = 60
+        self.player_padding_bottom_y = 155
+
 
         self.player = player
         self.despawn_rect = pygame.Rect(self.player.pos.x,self.player.pos.y,self.screen.get_size()[0],self.screen.get_size()[1])
@@ -29,7 +34,7 @@ class World:
         self.start_time = pygame.time.get_ticks()
         self.last_spawn_time = self.start_time
         self.enemies_killed = 0
-        self.max_enemies = 300
+        self.max_enemies = 200
         self.current_enemies = 0
 
         self.base_spawn_interval = 2000   
@@ -48,6 +53,7 @@ class World:
 
         self.weapon_db = load_weapon_db("weapons/weapons.JSON")
         self.all_weapon_ids = list(self.weapon_db.keys())
+        self.all_weapon_ids
 
         #load images
         self.assets = {}
@@ -55,11 +61,41 @@ class World:
         self.assets["sword"] = self.load_image("assets/weapons/sword/sword.png",1.5)
         self.assets["crossbow"] = self.load_image("assets/weapons/crossbow/crossbow.png",1.5)
         self.assets["shuriken"] = self.load_image("assets/weapons/shuriken/shuriken.png",1.5)
-        self.anims = {}
-        self.anims["sword"] = self.load_image("assets/weapons/sword/projectile/slash6.png",)
-        self.anims["arrow"] = self.load_image("assets/weapons/crossbow/arrow.png")
-        self.anims["shuriken"] = self.load_image("assets/weapons/shuriken/shuriken.png",1.5)
-        
+        self.assets["scroll"] = self.load_image("assets/attributes/scroll.png",1.5)
+        self.assets["hook"] = self.load_image("assets/attributes/hook.png",1.5)
+        self.assets["elixir"] = self.load_image("assets/attributes/elixir.png",1.5)
+        self.assets["kubek_deluxe"] = self.load_image("assets/attributes/kubek_deluxe.png",1.5)
+        self.assets["lamp"] = self.load_image("assets/attributes/lamp.png",1.5)
+        self.assets["ring"] = self.load_image("assets/attributes/ring.png",1.5)
+        self.proj = {}
+        self.proj["sword"] = self.load_image("assets/weapons/sword/projectile/slash6.png",)
+        self.proj["arrow"] = self.load_image("assets/weapons/crossbow/arrow.png")
+        self.proj["shuriken"] = self.load_image("assets/weapons/shuriken/shuriken.png",1.5)
+        self.proj["missle"] = self.load_image("assets/weapons/magic_wand/missle.png",1.5)
+
+        self.projectile_image_cache = {}
+
+    def generate_projectile_area_cache(self):
+        AREA_LEVELS = [1.0, 1.3, 1.6, 1.9, 2.2, 2.5]
+
+        for projectile_id, base_image in self.proj.items():
+            self.projectile_image_cache[projectile_id] = {}
+
+            base_w, base_h = base_image.get_size()
+
+            for area_mult in AREA_LEVELS:
+                if area_mult == 1.0:
+                    self.projectile_image_cache[projectile_id][area_mult] = base_image
+                    continue
+
+                scale = area_mult ** 0.5  
+                new_size = (
+                    int(base_w * scale),
+                    int(base_h * scale),
+                )
+
+                scaled = pygame.transform.smoothscale(base_image, new_size)
+                self.projectile_image_cache[projectile_id][area_mult] = scaled
 
     def rebuild_enemy_grid(self):
         self.enemy_grid.clear()
@@ -100,7 +136,7 @@ class World:
         return max(interval, self.min_spawn_interval)
 
     def get_batch_size(self):
-        return 1 + self.enemies_killed // 20
+        return 10 + self.enemies_killed // 20
 
     def random_pos_outside_camera(self, camera):
         angle = random.random() * 2 * math.pi          
@@ -173,23 +209,26 @@ class World:
 
 
 
-    def spawn_projectile(self,  projectile_id, pos, vel=(0,0), damage=1, pierce=1, owner=None, radius=3, lifetime=0.1,bounces=0):
+    def spawn_projectile(self,  projectile_id, pos, vel=(0,0), damage=1, pierce=1, owner=None, radius=3, lifetime=0.1,area_mult=1.0):
+        img = self.projectile_image_cache[projectile_id][area_mult]
+
+        if projectile_id == "missle":
+            LinearProjectile(pos, vel, damage, pierce, owner, img, radius, self.projectile_group, self.all_sprites_group, self.camera_group)
         if projectile_id == "arrow":
-            img = self.anims["arrow"]  
             LinearProjectile(pos, vel, damage, pierce, owner, img, radius, self.projectile_group, self.all_sprites_group, self.camera_group)
 
         elif projectile_id == "slash":
-            img = self.anims["sword"]  
             SlashHitbox(owner, damage, pierce, radius, img, lifetime, self.projectile_group, self.all_sprites_group, self.camera_group)
         elif projectile_id == "shuriken":
-            img = self.assets["shuriken"]
             ShurikenProjectile(pos, vel, damage, pierce, owner, img, radius,
                       self.projectile_group, self.all_sprites_group, self.camera_group)
 
 
 
     def open_chest(self):
-        upgradable = [w for w in self.player.weapons if w.can_level_up()]
+        upgradable_weapons = [w for w in self.player.weapons if w.can_level_up()]
+        upgradable_atributes = [a for a in self.player.attributes.values() if a.can_level_up()]
+        upgradable = upgradable_atributes+upgradable_weapons
         if not upgradable:
             return
         w = random.choice(upgradable)
