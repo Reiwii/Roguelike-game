@@ -9,7 +9,7 @@ class Game():
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((Setting.SCREEN_WIDTH, Setting.SCREEN_HEIGHT), pygame.RESIZABLE)
-        pygame.display.set_caption("Camera Movement Example")
+        pygame.display.set_caption("Game")
         self.clock = pygame.time.Clock()
         self.running = True
         self.dt = -1
@@ -34,14 +34,23 @@ class Game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            if event.type == pygame.VIDEORESIZE:
+                self.screen = pygame.display.set_mode(event.size, pygame.RESIZABLE)
+                self.world.screen = self.screen              
+                self.ui.on_resize(self.screen)              
+                self.camera.on_resize(self.screen)          
             self.ui.handle_event(event)
 
     def update(self):
         if not self.ui.paused:
             self.world.update(self.dt, self.camera)
-        # if self.world.player.leveled_up:
-        #     self.world.player.leveled_up = False
-        #     self.ui.open_levelup_choices()
+        if self.world.player.leveled_up:
+            self.world.player.leveled_up = False
+            offers = UI.roll_3_offers(self.world)
+            if offers:                      
+                self.ui.open_upgrade(offers)
+            else:
+                self.world.player.hp = self.world.player.max_hp
 
     def draw(self):
         self.camera.custom_draw(self.player)
@@ -53,7 +62,7 @@ class Game():
             self.handle_events()
             self.update()
             self.draw()
-            self.dt = self.clock.tick(59) / 1000
+            self.dt = self.clock.tick(60) / 1000
 
         pygame.quit()
 

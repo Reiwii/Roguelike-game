@@ -38,6 +38,5 @@ class CrossbowWeapon(BaseWeapon):
                 damage=stats.damage,
                 pierce=stats.pierce,
                 owner=owner,
-                radius=0,
-                projectile_id ="arrow"
+                projectile_id ="arrow",
             )

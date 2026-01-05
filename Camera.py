@@ -23,6 +23,17 @@ class Camera(pygame.sprite.Group):
         self.tiles = math.ceil(self.screen_width / self.ground_width)
 
 
+    def on_resize(self, screen):
+        self.display_surface = pygame.display.get_surface()
+        self.screen_width, self.screen_height = self.display_surface.get_size()
+
+        l = self.camera_borders['left']
+        t = self.camera_borders['top']
+        w = self.screen_width - (self.camera_borders['left'] + self.camera_borders['right'])
+        h = self.screen_height - (self.camera_borders['top'] + self.camera_borders['bottom'])
+        self.camera_rect = pygame.Rect(l, t, w, h)
+
+        self.tiles = math.ceil(self.screen_width / self.ground_width)
     def box_target_camera(self,target):
         if target.rect.left < self.camera_rect.left:
             self.camera_rect.left = target.rect.left

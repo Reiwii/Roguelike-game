@@ -3,49 +3,51 @@
     "name": "Magic Wand",
     "levels": [
       { "damage": 10, "cooldown": 1.00, "amount": 1, "speed": 450, "pierce": 3 },
-      { "damage": 12, "cooldown": 0.95, "amount": 1, "speed": 470, "pierce": 0 },
-      { "damage": 14, "cooldown": 0.90, "amount": 2, "speed": 470, "pierce": 0 }
-    ],
-    "evolution": { "required_passive_id": "empty_tome", "evolved_weapon_id": "holy_wand" }
+      { "damage": 12, "cooldown": 0.95, "amount": 1, "speed": 470, "pierce": 3 },
+      { "damage": 14, "cooldown": 0.85, "amount": 2, "speed": 470, "pierce": 3 },
+      { "damage": 16, "cooldown": 0.85, "amount": 2, "speed": 470, "pierce": 4 },
+      { "damage": 18, "cooldown": 0.80, "amount": 2, "speed": 470, "pierce": 4 },
+      { "damage": 20, "cooldown": 0.80, "amount": 3, "speed": 470, "pierce": 4 },
+      { "damage": 25, "cooldown": 0.70, "amount": 3, "speed": 470, "pierce": 5 }
+    ]
   },
 
   "shuriken": {
     "name": "Shuriken",
     "levels": [
-      { "damage": 8,  "cooldown": 0.80, "amount": 1, "speed": 550, "pierce": 4 },
-      { "damage": 10, "cooldown": 0.75, "amount": 2, "speed": 570, "pierce": 4 },
-      { "damage": 13, "cooldown": 0.70, "amount": 3, "speed": 600, "pierce": 4 }
-    ],
-    "evolution": { "required_passive_id": "dagger_scroll", "evolved_weapon_id": "shadow_shuriken" }
+      { "damage": 8,  "cooldown": 1.10, "amount": 1, "speed": 550, "pierce": 2 },
+      { "damage": 10, "cooldown": 1.05, "amount": 2, "speed": 570, "pierce": 2 },
+      { "damage": 13, "cooldown": 1.00, "amount": 3, "speed": 600, "pierce": 3 },
+      { "damage": 13, "cooldown": 0.90, "amount": 3, "speed": 600, "pierce": 3 },
+      { "damage": 16, "cooldown": 0.80, "amount": 3, "speed": 600, "pierce": 3 },
+      { "damage": 19, "cooldown": 0.70, "amount": 3, "speed": 600, "pierce": 4 },
+      { "damage": 20, "cooldown": 0.60, "amount": 3, "speed": 600, "pierce": 4 }
+    ]
   },
 
   "crossbow": {
     "name": "Crossbow",
     "levels": [
-      { "damage": 20, "cooldown": 1.30, "amount": 1, "speed": 380, "pierce": 4 },
-      { "damage": 24, "cooldown": 1.20, "amount": 1, "speed": 400, "pierce": 5 },
-      { "damage": 28, "cooldown": 1.10, "amount": 2, "speed": 420, "pierce": 6 }
-    ],
-    "evolution": { "required_passive_id": "spinach", "evolved_weapon_id": "inferno_wand" }
-  },
-
-  "green_wand": {
-    "name": "Axe",
-    "levels": [
-      { "damage": 6,  "cooldown": 0.60, "amount": 1, "speed": 420, "pierce": 0 },
-      { "damage": 7,  "cooldown": 0.55, "amount": 2, "speed": 440, "pierce": 0 },
-      { "damage": 9,  "cooldown": 0.50, "amount": 3, "speed": 460, "pierce": 0 }
-    ],
-    "evolution": { "required_passive_id": "clover", "evolved_weapon_id": "emerald_staff" }
+      { "damage": 20, "cooldown": 2.00, "amount": 1, "speed": 380, "pierce": 5 },
+      { "damage": 24, "cooldown": 2.00, "amount": 1, "speed": 400, "pierce": 5 },
+      { "damage": 28, "cooldown": 1.90, "amount": 2, "speed": 420, "pierce": 6 },
+      { "damage": 28, "cooldown": 1.90, "amount": 2, "speed": 420, "pierce": 6 },
+      { "damage": 28, "cooldown": 1.80, "amount": 2, "speed": 420, "pierce": 7 },
+      { "damage": 28, "cooldown": 1.80, "amount": 2, "speed": 420, "pierce": 7 },
+      { "damage": 28, "cooldown": 1.70, "amount": 2, "speed": 420, "pierce": 8 }
+    ]
   },
 
   "sword": {
     "name": "Sword",
     "levels": [
       { "damage": 18, "cooldown": 2, "amount": 1, "speed": 0,   "pierce": -1 },
-      { "damage": 22, "cooldown": 2, "amount": 1, "speed": 0,   "pierce": -1 },
-      { "damage": 26, "cooldown": 2, "amount": 2, "speed": 0,   "pierce": -1 }
-    ],
-    "evolution": { "required_passive_id": "armor", "evolved_weapon_id": "legendary_blade" }
+      { "damage": 22, "cooldown": 1.9, "amount": 1, "speed": 0,   "pierce": -1 },
+      { "damage": 26, "cooldown": 1.8, "amount": 1, "speed": 0,   "pierce": -1 },
+      { "damage": 26, "cooldown": 1.7, "amount": 1, "speed": 0,   "pierce": -1 },
+      { "damage": 26, "cooldown": 1.7, "amount": 1, "speed": 0,   "pierce": -1 },
+      { "damage": 26, "cooldown": 1.6, "amount": 1, "speed": 0,   "pierce": -1 },
+      { "damage": 26, "cooldown": 1.5, "amount": 1, "speed": 0,   "pierce": -1 }
+    ]
   }
 }

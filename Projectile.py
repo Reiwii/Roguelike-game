@@ -1,14 +1,13 @@
 import pygame
 
 class DamageHitbox(pygame.sprite.Sprite):
-    def __init__(self, pos, damage, pierce, owner, radius, image, *groups):
+    def __init__(self, pos, damage, pierce, owner, image, *groups):
         super().__init__(*groups)
         self.owner = owner
         self.pos = pygame.Vector2(pos)
 
         self.damage = damage
         self.pierce = pierce          #-1 inf
-        self.radius = radius          
         self.enemies_hit = set()
 
         self.image = image
@@ -37,11 +36,11 @@ class DamageHitbox(pygame.sprite.Sprite):
 
 
 class LinearProjectile(DamageHitbox):
-    def __init__(self, pos, vel, damage, pierce, owner, image, radius=3, *groups):
+    def __init__(self, pos, vel, damage, pierce, owner, image,  *groups):
         self.vel = pygame.Vector2(vel)
-
         self.original_image = image
-        super().__init__(pos, damage, pierce, owner, radius, image, *groups)
+        super().__init__(pos, damage, pierce, owner, image, *groups)
+        self.radius = 6
 
 
         if self.vel.length_squared() > 0:
@@ -62,9 +61,10 @@ class LinearProjectile(DamageHitbox):
 
 
 class SlashHitbox(DamageHitbox):
-    def __init__(self, owner, damage, pierce, radius, image, lifetime, *groups):
-        super().__init__(owner.rect.center, damage, pierce, owner, radius, image, *groups)
+    def __init__(self, owner, damage, pierce, image, lifetime, *groups):
+        super().__init__(owner.rect.center, damage, pierce, owner, image, *groups)
         self.lifetime = lifetime
+        self.radius = 15 
 
     def update(self, world, dt):
         self.pos.update(self.owner.rect.center)
@@ -76,9 +76,10 @@ class SlashHitbox(DamageHitbox):
         if self.lifetime <= 0:
             self.kill()
 class ShurikenProjectile(DamageHitbox):
-    def __init__(self, pos, vel, damage, pierce, owner, image, radius=6, *groups):
+    def __init__(self, pos, vel, damage, pierce, owner, image, *groups):
         self.vel = pygame.Vector2(vel)
-        super().__init__(pos, damage, pierce, owner, radius, image, *groups)
+        super().__init__(pos, damage, pierce, owner, image, *groups)
+        self.radius = 6
 
     def on_hit_enemy(self, world, enemy):
         enemy.take_damage(self.damage, world, world.player.pos)

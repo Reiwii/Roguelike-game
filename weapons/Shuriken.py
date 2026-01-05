@@ -38,6 +38,5 @@ class Shuriken(BaseWeapon):
                 damage=stats.damage,
                 pierce=stats.pierce,
                 owner=owner,
-                radius=0,
-                projectile_id ="shuriken"
+                projectile_id ="shuriken",
             )

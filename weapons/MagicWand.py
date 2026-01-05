@@ -33,11 +33,10 @@ class MagicWandWeapon(BaseWeapon):
 
         for _ in range(stats.amount):
             world.spawn_projectile(
+                projectile_id = "missle",
                 pos=(ox, oy),
                 vel=(vx * stats.speed, vy * stats.speed),
                 damage=stats.damage,
                 pierce=stats.pierce,
                 owner=owner,
-                radius=0,
-                proj="proj"
             )

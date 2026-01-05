@@ -1,4 +1,3 @@
-from numpy import concat
 import pygame
 import random
 import Player
@@ -68,34 +67,10 @@ class World:
         self.assets["lamp"] = self.load_image("assets/attributes/lamp.png",1.5)
         self.assets["ring"] = self.load_image("assets/attributes/ring.png",1.5)
         self.proj = {}
-        self.proj["sword"] = self.load_image("assets/weapons/sword/projectile/slash6.png",)
+        self.proj["slash"] = self.load_image("assets/weapons/sword/projectile/slash6.png",)
         self.proj["arrow"] = self.load_image("assets/weapons/crossbow/arrow.png")
         self.proj["shuriken"] = self.load_image("assets/weapons/shuriken/shuriken.png",1.5)
         self.proj["missle"] = self.load_image("assets/weapons/magic_wand/missle.png",1.5)
-
-        self.projectile_image_cache = {}
-
-    def generate_projectile_area_cache(self):
-        AREA_LEVELS = [1.0, 1.3, 1.6, 1.9, 2.2, 2.5]
-
-        for projectile_id, base_image in self.proj.items():
-            self.projectile_image_cache[projectile_id] = {}
-
-            base_w, base_h = base_image.get_size()
-
-            for area_mult in AREA_LEVELS:
-                if area_mult == 1.0:
-                    self.projectile_image_cache[projectile_id][area_mult] = base_image
-                    continue
-
-                scale = area_mult ** 0.5  
-                new_size = (
-                    int(base_w * scale),
-                    int(base_h * scale),
-                )
-
-                scaled = pygame.transform.smoothscale(base_image, new_size)
-                self.projectile_image_cache[projectile_id][area_mult] = scaled
 
     def rebuild_enemy_grid(self):
         self.enemy_grid.clear()
@@ -209,18 +184,20 @@ class World:
 
 
 
-    def spawn_projectile(self,  projectile_id, pos, vel=(0,0), damage=1, pierce=1, owner=None, radius=3, lifetime=0.1,area_mult=1.0):
-        img = self.projectile_image_cache[projectile_id][area_mult]
+    def spawn_projectile(self,  projectile_id, pos, vel=(0,0), damage=1, pierce=1, owner=None, lifetime=0.1):
 
         if projectile_id == "missle":
-            LinearProjectile(pos, vel, damage, pierce, owner, img, radius, self.projectile_group, self.all_sprites_group, self.camera_group)
+            img = self.proj["missle"]
+            LinearProjectile(pos, vel, damage, pierce, owner, img, self.projectile_group, self.all_sprites_group, self.camera_group)
         if projectile_id == "arrow":
-            LinearProjectile(pos, vel, damage, pierce, owner, img, radius, self.projectile_group, self.all_sprites_group, self.camera_group)
-
+            img = self.proj["arrow"]
+            LinearProjectile(pos, vel, damage, pierce, owner, img, self.projectile_group, self.all_sprites_group, self.camera_group)
         elif projectile_id == "slash":
-            SlashHitbox(owner, damage, pierce, radius, img, lifetime, self.projectile_group, self.all_sprites_group, self.camera_group)
+            img = self.proj["slash"]
+            SlashHitbox(owner, damage, pierce, img, lifetime, self.projectile_group, self.all_sprites_group, self.camera_group)
         elif projectile_id == "shuriken":
-            ShurikenProjectile(pos, vel, damage, pierce, owner, img, radius,
+            img = self.proj["shuriken"]
+            ShurikenProjectile(pos, vel, damage, pierce, owner, img,
                       self.projectile_group, self.all_sprites_group, self.camera_group)
 
 

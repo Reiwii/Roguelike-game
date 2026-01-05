@@ -26,7 +26,7 @@ class Enemy(sprite.Sprite):
             self.radius = 32
             self.scale = 2
         else:
-            self.stats = EnemyStats(20,10,1)
+            self.stats = EnemyStats(1,10,1)
             self.radius = 16
             self.scale = 1
 
