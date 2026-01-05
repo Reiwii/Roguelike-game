@@ -17,22 +17,21 @@ class DamageHitbox(pygame.sprite.Sprite):
         enemy.take_damage(self.damage, world, world.player.pos)
 
     def handle_hits(self, world):
-        hits = pygame.sprite.spritecollide(self, world.enemies_group, False, collided=pygame.sprite.collide_circle)
-        for e in hits:
-            if e.action  == "die":
+        for e in world.enemies_near(self.pos,self.radius):
+            if e.action == "die" or e in self.enemies_hit:
                 continue
-            if e in self.enemies_hit:
-                continue
+
+            if not pygame.sprite.collide_circle(self, e):
+                continue  
 
             self.enemies_hit.add(e)
             self.on_hit_enemy(world, e)
 
-            if self.pierce == -1:
-                continue
-            self.pierce -= 1
-            if self.pierce <= 0:
-                self.kill()
-                break
+            if self.pierce != -1:
+                self.pierce -= 1
+                if self.pierce <= 0:
+                    self.kill()
+                    return
 
 
 class LinearProjectile(DamageHitbox):
@@ -64,7 +63,7 @@ class SlashHitbox(DamageHitbox):
     def __init__(self, owner, damage, pierce, image, lifetime, *groups):
         super().__init__(owner.rect.center, damage, pierce, owner, image, *groups)
         self.lifetime = lifetime
-        self.radius = 15 
+        self.radius = 100
 
     def update(self, world, dt):
         self.pos.update(self.owner.rect.center)

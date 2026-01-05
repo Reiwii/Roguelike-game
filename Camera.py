@@ -54,15 +54,15 @@ class Camera(pygame.sprite.Group):
         self.offset.x = self.camera_rect.left - self.camera_borders['left']
         self.offset.y = self.camera_rect.top - self.camera_borders['top']
 
-    def custom_draw(self,player):
+    def custom_draw(self,player,surface):
         self.box_target_camera(player)
         start_col = int(self.offset.x // self.ground_width)
         for x in range(start_col - 1, start_col + self.tiles + 2):
             x_pos = (x * self.ground_width) - self.offset.x
             y_pos = self.ground_rect.top - self.offset.y
-            self.display_surface.blit(self.ground_surf, (x_pos, y_pos))
+            surface.blit(self.ground_surf, (x_pos, y_pos))
 
         for sprite in sorted(self.sprites(),key=lambda sprite: sprite.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset 
-            self.display_surface.blit(sprite.image,offset_pos)
+            surface.blit(sprite.image,offset_pos)
 

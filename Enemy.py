@@ -1,3 +1,4 @@
+from collections import defaultdict
 import pygame.sprite as sprite
 import pygame
 import World
@@ -16,17 +17,17 @@ class Enemy(sprite.Sprite):
     sheet = None
     frames = None
     animations = None
-    def __init__(self,pos,is_boss,*groups:list[pygame.sprite.Group]):
+    def __init__(self,pos,is_boss,hp,*groups:list[pygame.sprite.Group]):
         super().__init__(*groups)
     
         # combat stats 
         self.is_boss=is_boss
         if self.is_boss:
-            self.stats = EnemyStats(10,10,1)
+            self.stats = EnemyStats(hp,30,0.5)
             self.radius = 32
             self.scale = 2
         else:
-            self.stats = EnemyStats(1,10,1)
+            self.stats = EnemyStats(hp,10,0.5)
             self.radius = 16
             self.scale = 1
 
@@ -34,7 +35,7 @@ class Enemy(sprite.Sprite):
         self.action = 'walk_side_left' 
         self.frame_index = 0;
         self.pos = pygame.math.Vector2(pos)
-        self.image = self.animations[self.action][self.frame_index]
+        self.image = self.animations[(self.action,self.scale)][self.frame_index]
         self.rect = self.image.get_rect(center=self.pos)
         self.frame_count = 0;
         self.animation_speed = 0.05;
@@ -49,18 +50,27 @@ class Enemy(sprite.Sprite):
         if cls.sheet is not None:
             return
         sheet = pygame.image.load("assets/Skeleton.png").convert_alpha()
-        cls.sheet = pygame.transform.scale_by(sheet,3)
-        frame_w = 32 * 3
-        frame_h = 32 * 3
+        cls.sheet = pygame.transform.scale_by(sheet,2)
+        frame_w = 32 *2
+        frame_h = 32 *2
         cls.all_frames = cls.slice_sheet(cls.sheet,frame_w,frame_h)
         for i,frame in enumerate(cls.all_frames[24:30]):
             cls.all_frames[i] = pygame.transform.flip(frame,flip_x=True,flip_y=False)
 
-        cls.animations = {
+            
+       
+        cls.animations = defaultdict(list)
+        anim_frames = {
             'walk_side_right':cls.all_frames[24:30],
             'walk_side_left':cls.all_frames[0:6],
-            'die':cls.all_frames[36:40]
+            'die':cls.all_frames[36:40],
         }
+        for anim,frames in anim_frames.items():
+            for frame in frames:
+                cls.animations[(anim,1)].append(frame)
+                cls.animations[(anim,2)].append(pygame.transform.scale_by(frame,2))
+
+        
             
         
     @staticmethod
@@ -107,7 +117,10 @@ class Enemy(sprite.Sprite):
     
     def animate(self):
         self.frame_count += self.animation_speed
-        animation_list = self.animations[self.action]
+        if not self.is_boss:
+            animation_list = self.animations[(self.action,self.scale)]
+        else:
+            animation_list = self.animations[(self.action,self.scale)]
 
         if self.frame_count > 1:
             self.frame_index +=1
@@ -119,7 +132,7 @@ class Enemy(sprite.Sprite):
                 return
             self.frame_index = 0
         frame = animation_list[self.frame_index]
-        self.image = pygame.transform.scale_by(frame,self.scale)
+        self.image = frame
 
 
 
@@ -153,5 +166,5 @@ class Enemy(sprite.Sprite):
             if self.is_boss:
                 Chest(self.pos, world.chest_group, world.all_sprites_group, world.camera_group)
             else:
-                ExpGem.ExpGem(self.pos, world.exp_orb_group, world.all_sprites_group, world.camera_group)
+                ExpGem.ExpGem(self.pos,world.exp_orb_image, world.exp_orb_group, world.all_sprites_group, world.camera_group)
 

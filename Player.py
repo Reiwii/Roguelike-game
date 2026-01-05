@@ -80,7 +80,7 @@ class Player(sprite.Sprite):
         self.xp += value
         if self.xp >= self.xp_to_next_level:
             self.xp = 0
-            self.xp_to_next_level += 10 
+            self.xp_to_next_level += 5 * self.level 
             self.level +=1
             self.leveled_up = True
 

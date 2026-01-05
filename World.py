@@ -47,14 +47,18 @@ class World:
             tree = Tree.Tree((x, y), self.camera_group)
         
         
-        self.cell_size = 12
+        self.cell_size = 32
+        self.orb_cell_size = 50
         self.enemy_grid = defaultdict(list)
+        self.orb_grid = defaultdict(list)
+        self.timer = 0
 
         self.weapon_db = load_weapon_db("weapons/weapons.JSON")
         self.all_weapon_ids = list(self.weapon_db.keys())
         self.all_weapon_ids
 
         #load images
+        self.exp_orb_image = pygame.image.load("assets/exp_orb.png")
         self.assets = {}
         self.assets["magic_wand"] = self.load_image("assets/weapons/magic_wand/magic_wand.png",1.5)
         self.assets["sword"] = self.load_image("assets/weapons/sword/sword.png",1.5)
@@ -77,6 +81,29 @@ class World:
         cs = self.cell_size
         for e in self.enemies_group:
             self.enemy_grid[(int(e.pos.x // cs), int(e.pos.y // cs))].append(e)
+
+    def rebuild_orb_grid(self):
+        self.orb_grid.clear()
+        cs = self.orb_cell_size
+        for g in self.exp_orb_group:
+            self.orb_grid[(int(g.pos.x // cs), int(g.pos.y // cs))].append(g)
+        
+    def merge_orbs(self):
+        if len(self.exp_orb_group) < 10: 
+            return
+
+        for _, gems in self.orb_grid.items():
+            if len(gems) <= 3:
+                continue
+
+            keeper = gems[0]
+            total = sum(g.value for g in gems)
+            keeper.value = total
+
+            for g in gems[1:]:
+                g.kill()
+
+
 
     def resolve_enemy_collisions(self):
         for (cx, cy), enemies in self.enemy_grid.items():
@@ -105,20 +132,21 @@ class World:
         self.enemies_killed += 1
 
     def get_spawn_interval_ms(self):
-        elapsed = (pygame.time.get_ticks() - self.start_time) / 1000.0
+        elapsed = (pygame.time.get_ticks() - self.start_time) / 1000.0 # in sek
         difficulty = 1.0 + elapsed * 0.01 + self.enemies_killed * 0.02
         interval = self.base_spawn_interval / difficulty
         return max(interval, self.min_spawn_interval)
 
     def get_batch_size(self):
-        return 10 + self.enemies_killed // 20
+        return 1 + self.enemies_killed // 20
 
     def random_pos_outside_camera(self, camera):
         angle = random.random() * 2 * math.pi          
-        dist  = random.randint(400,800)    
+        dist_x  = self.screen.get_size()[0]//2
+        dist_y  = self.screen.get_size()[1]//2
 
-        x = self.player.rect.centerx + math.cos(angle) * dist
-        y = self.player.rect.centery + math.sin(angle) * dist
+        x = self.player.rect.centerx + math.cos(angle) * dist_x
+        y = self.player.rect.centery + math.sin(angle) * dist_y
 
         return x, y
 
@@ -133,9 +161,10 @@ class World:
             return
 
         self.number_of_spawned_waves +=1
-        if self.number_of_spawned_waves % 2 == 0:
+        hp = 10+self.enemies_killed //10
+        if self.number_of_spawned_waves % 20 == 0:
             x, y = self.random_pos_outside_camera(camera)
-            Enemy.Enemy((x, y),True, self.camera_group,
+            Enemy.Enemy((x, y),True,hp+100, self.camera_group,
                         self.enemies_group, self.all_sprites_group)
 
         self.last_spawn_time = now
@@ -143,21 +172,35 @@ class World:
         self.current_enemies += batch
         for _ in range(batch):
             x, y = self.random_pos_outside_camera(camera)
-            Enemy.Enemy((x, y),False, self.camera_group,
+            Enemy.Enemy((x, y),False,hp, self.camera_group,
                         self.enemies_group, self.all_sprites_group)
 
     def update(self, dt, camera):
         self.despawn_rect.center = self.player.pos
         self.all_sprites_group.update(self, dt)
         self.spawn_enemies(camera)
-        self.rebuild_enemy_grid()
-        self.resolve_enemy_collisions()
 
+        ### this doesnt have to be done every frame.###
+        self.timer += dt
+        if self.timer > 1:
+            self.timer = 0
+            self.rebuild_enemy_grid()
+            self.resolve_enemy_collisions()
+            self.rebuild_orb_grid()
+            self.merge_orbs()
+            # if enemy to far change pos 
+            for e in self.enemies_group:
+                if not self.despawn_rect.colliderect(e.rect):
+                    x, y = self.random_pos_outside_camera(camera)
+                    e.pos.update(x, y)
+                    e.rect.center = (int(x), int(y))
+
+
+        ### every frame ###
         #gem orb 
         gems_hit = pygame.sprite.spritecollide(self.player, self.exp_orb_group, dokill=True)
         for gem in gems_hit:
             self.player.add_xp(gem.value)
-            gem.kill()
 
         #chest 
         opened = pygame.sprite.spritecollide(self.player, self.chest_group, dokill=True)
@@ -166,23 +209,27 @@ class World:
 
 
         #PLAYER ENEMY COL
-        hits = pygame.sprite.spritecollide(
-            self.player,
-            self.enemies_group,
-            dokill=False,
-            collided=pygame.sprite.collide_circle)
-
+        hits = pygame.sprite.spritecollide(self.player,self.enemies_group,dokill=False,collided=pygame.sprite.collide_circle)
         for e in hits:
             self.player.take_damage(e.stats.damage)
             e.take_damage(0,self,self.player.pos)
 
-        for e in self.enemies_group:
-            if not self.despawn_rect.colliderect(e.rect):
-                x, y = self.random_pos_outside_camera(camera)
-                e.pos.update(x, y)
-                e.rect.center = (int(x), int(y))
 
 
+
+
+    def enemies_near(self, pos, radius=0):
+        cs = self.cell_size
+        cx = int(pos.x // cs)
+        cy = int(pos.y // cs)
+
+        cell_r = max(1, int(radius // cs) + 1)
+
+        out = []
+        for dx in range(-cell_r, cell_r + 1):
+            for dy in range(-cell_r, cell_r + 1):
+                out.extend(self.enemy_grid.get((cx + dx, cy + dy), []))
+        return out
 
     def spawn_projectile(self,  projectile_id, pos, vel=(0,0), damage=1, pierce=1, owner=None, lifetime=0.1):
 

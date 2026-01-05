@@ -8,7 +8,9 @@ import UI
 class Game():
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((Setting.SCREEN_WIDTH, Setting.SCREEN_HEIGHT), pygame.RESIZABLE)
+        self.res = (Setting.SCREEN_WIDTH,Setting.SCREEN_HEIGHT)
+        self.screen = pygame.display.set_mode(self.res, pygame.RESIZABLE)
+        self.render_surface = pygame.Surface(self.res)
         pygame.display.set_caption("Game")
         self.clock = pygame.time.Clock()
         self.running = True
@@ -25,20 +27,26 @@ class Game():
                                  self.enemies_group,self.all_sprites_group,
                                  self.projectile_group,self.exp_orb_group,
                                  self.chest_group)
-        sword = create_weapon("shuriken", self.world.weapon_db)
+        sword = create_weapon("sword", self.world.weapon_db)
         self.player.weapons.append(sword)
 
-        self.ui = UI.UI(self.screen,self.world)
+        self.ui = UI.UI(self.render_surface,self.world)
 
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+
             if event.type == pygame.VIDEORESIZE:
                 self.screen = pygame.display.set_mode(event.size, pygame.RESIZABLE)
-                self.world.screen = self.screen              
-                self.ui.on_resize(self.screen)              
-                self.camera.on_resize(self.screen)          
+                self.ui.on_resize(self.render_surface)
+
+            if event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION):
+                curr_screen_w, curr_screen_h = self.screen.get_size()
+                scale_x = Setting.SCREEN_WIDTH / curr_screen_w
+                scale_y = Setting.SCREEN_HEIGHT / curr_screen_h
+                scaled_pos = (event.pos[0] * scale_x, event.pos[1] * scale_y)
+                event.pos = scaled_pos
             self.ui.handle_event(event)
 
     def update(self):
@@ -53,9 +61,14 @@ class Game():
                 self.world.player.hp = self.world.player.max_hp
 
     def draw(self):
-        self.camera.custom_draw(self.player)
+        self.render_surface.fill((0,0,0)) 
+        self.camera.custom_draw(self.player, self.render_surface)
         self.ui.draw()
+        scaled = pygame.transform.scale(self.render_surface, self.screen.get_size())
+        self.screen.blit(scaled, (0, 0))
+
         pygame.display.flip()
+
 
     def run(self):
         while self.running:
@@ -63,6 +76,7 @@ class Game():
             self.update()
             self.draw()
             self.dt = self.clock.tick(60) / 1000
+            print(self.clock.get_fps())
 
         pygame.quit()
 

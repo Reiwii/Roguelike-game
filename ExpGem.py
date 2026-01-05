@@ -1,9 +1,9 @@
 import pygame
 
 class ExpGem(pygame.sprite.Sprite):
-    def __init__(self,pos, *groups):
+    def __init__(self,pos,image, *groups):
         super().__init__(*groups)
-        self.value = 10
+        self.value = 1
         self.pos = pos
-        self.image = pygame.image.load("assets/exp_orb.png")
+        self.image = image 
         self.rect = self.image.get_rect(center=self.pos)
