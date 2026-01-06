@@ -31,10 +31,13 @@ class Shuriken(BaseWeapon):
         length = math.hypot(dx, dy) or 1.0
         vx, vy = dx / length, dy / length
 
-        for _ in range(stats.amount):
+        base_vx,base_vy = vx * stats.speed, vy * stats.speed
+        spread = 50
+        for i in range(stats.amount):
+            offset = i * spread
             world.spawn_projectile(
                 pos=(ox, oy),
-                vel=(vx * stats.speed, vy * stats.speed),
+                vel=(base_vx + offset,base_vy - offset),
                 damage=stats.damage,
                 pierce=stats.pierce,
                 owner=owner,

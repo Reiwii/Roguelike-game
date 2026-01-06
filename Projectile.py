@@ -27,7 +27,7 @@ class DamageHitbox(pygame.sprite.Sprite):
             self.enemies_hit.add(e)
             self.on_hit_enemy(world, e)
 
-            if self.pierce != -1:
+            if self.pierce > 0: 
                 self.pierce -= 1
                 if self.pierce <= 0:
                     self.kill()
