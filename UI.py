@@ -1,9 +1,10 @@
 import pygame
+import World
 from weapons.weapons_from_json import create_weapon
 from Player import Attribute
 
 class UI:
-    def __init__(self, screen, world):
+    def __init__(self, screen:pygame.Surface, world:World.World) -> None:
         self.screen = screen
         self.paused = False
         self.world = world
@@ -16,10 +17,8 @@ class UI:
         self.X_button = pygame.image.load("assets/X.png").convert_alpha()
         pause_button = pygame.image.load("assets/Pause.png").convert_alpha()
         self.pause_button = pygame.transform.scale_by(pause_button, 3)
-
         resume_button = pygame.image.load("assets/resume.png").convert_alpha()
         self.resume_button = pygame.transform.scale_by(resume_button, 3)
-
 
         self.weapon_icons = {
             "magic_wand": self.world.assets["magic_wand"],
@@ -48,7 +47,7 @@ class UI:
             self.world.player.xp_to_next_level,
             self.world.player.xp
         )
-
+        self.stats_rect = pygame.Rect(20, 95, 220, 110)  
         self.pause_rect = self.pause_button.get_rect(
             topright=(screen.get_width() - 20, 20)
         )
@@ -66,42 +65,31 @@ class UI:
         self.offer_rects = []    
 
         self.upgrade_font = pygame.font.Font(None, 28)
-        self.upgrade_small = pygame.font.Font(None, 20)
 
 
-    def on_resize(self, screen):
+
+    def on_resize(self, screen:pygame.Surface)->None:
         self.screen = screen
 
-        self.pause_rect = self.pause_button.get_rect(
-            topright=(screen.get_width() - 20, 20)
-        )
-        self.resume_rect = self.resume_button.get_rect(
-            center=(screen.get_width() // 2, screen.get_height() // 2)
-        )
 
-        self.overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
-        self.overlay.fill((0, 0, 0, 180))
-
-        if self.upgrade_open:
-            self._build_offer_rects()
-    def apply_offer(self, offer):
+    def apply_offer(self, offer:dict[str,str]):
         p = self.world.player
 
-        if offer.kind == "weapon":
+        if offer["kind"] == "weapon":
             for w in p.weapons:
-                if w.id == offer.id:
+                if w.id == offer["id"]:
                     w.level_up()
                     return
 
             # not owned yet
-            new_w = create_weapon(offer.id, self.world.weapon_db)
+            new_w = create_weapon(offer["id"], self.world.weapon_db)
             p.weapons.append(new_w)
             return
 
         # attribute
-        attr = p.attributes.get(offer.id)
+        attr = p.attributes.get(offer["id"])
         if attr is None:
-            p.attributes[offer.id] = Attribute(id=offer.id, level=1, max_level=5)
+            p.attributes[offer["id"]] = Attribute(id=offer["id"], level=1, max_level=5)
         else:
             attr.level_up()
 
@@ -141,6 +129,22 @@ class UI:
 
         self.health_bar.draw(self.screen)
         self.exp_bar.draw(self.screen)
+
+        # stats bellow exp bar
+        pygame.draw.rect(self.screen, (20, 20, 20), self.stats_rect, border_radius=8)
+        pygame.draw.rect(self.screen, (220, 220, 220), self.stats_rect, width=2, border_radius=8)
+        cs = self.world.player.combat_stats
+        lines = [
+            f"Might: x{cs.might_mult:.2f}  (elixir)",
+            f"Cooldown: x{cs.cooldown_mult:.2f}  (hook)",
+            f"Speed: x{cs.speed_mult:.2f}  (scroll)",
+            f"Amount: +{cs.amount_bonus}  (ring)",
+            f"Pierce: +{cs.pierce_bonus}  (lamp)",
+        ]
+        for i, s in enumerate(lines):
+            surf = self.font.render(s, True, (255,255,255))
+            self.screen.blit(surf, (self.stats_rect.x + 10, self.stats_rect.y+10 + i * 20))
+
 
         if self.paused:
             self.screen.blit(self.overlay, (0, 0))
@@ -245,10 +249,10 @@ class UI:
             pygame.draw.rect(self.screen, bg_col, rect, border_radius=10)
             pygame.draw.rect(self.screen, border_col, rect, width=3, border_radius=10)
 
-            if offer.kind == "weapon":
-                icon = self.weapon_icons.get(offer.id)
+            if offer["kind"] == "weapon":
+                icon = self.weapon_icons.get(offer["id"])
             else:
-                icon = self.attribute_icons.get(offer.id)
+                icon = self.attribute_icons.get(offer["id"])
 
             icon_center = (rect.left + 40, rect.centery)
             if icon:
@@ -256,26 +260,26 @@ class UI:
             name_x = rect.left + 80
             name_y = rect.top + 18
 
-            name_surf = self.upgrade_small.render(offer.title, True, (255, 255, 255))
+            name_surf = self.font.render(offer["title"], True, (255, 255, 255))
             self.screen.blit(name_surf, (name_x, name_y))
 
             cur, mx = self._get_offer_levels(offer)
-            lvl_surf = self.upgrade_small.render(f"({cur}/{mx})", True, (220, 220, 220))
+            lvl_surf = self.font.render(f"({cur}/{mx})", True, (220, 220, 220))
             self.screen.blit(lvl_surf, (name_x, name_y + 28))
 
-            hint = self.upgrade_small.render("Click to pick", True, (180, 180, 180))
+            hint = self.font.render("Click to pick", True, (180, 180, 180))
             self.screen.blit(hint, (name_x, name_y + 56))
 
     def _get_offer_levels(self, offer):
         p = self.world.player
 
-        if offer.kind == "weapon":
+        if offer["kind"] == "weapon":
             for w in p.weapons:
-                if w.id == offer.id:
+                if w.id == offer["id"]:
                     return (w.level, w.max_level)
             return (0, 5)
 
-        attr = p.attributes.get(offer.id)
+        attr = p.attributes.get(offer["id"])
         if attr:
             return (attr.level, attr.max_level)
         return (0, 5)
@@ -347,15 +351,9 @@ class ExpBar(Bar):
 from dataclasses import dataclass
 import random
 
-@dataclass
-class Offer:
-    kind: str          
-    id: str            
-    title: str         
-
-def build_offers(world) -> list[Offer]:
+def build_offers(world: World) -> list[dict[str,str]]:
     p = world.player
-    offers: list[Offer] = []
+    offers: list[dict[str,str]] = []
 
     MAX_WEAPONS = 3
     MAX_ATTRS   = 3
@@ -368,25 +366,25 @@ def build_offers(world) -> list[Offer]:
         if wid in owned_weapon_ids:
             w = next(w for w in p.weapons if w.id == wid)
             if w.can_level_up():
-                offers.append(Offer("weapon", wid, f"{wid} +1"))
+                offers.append({"kind":"weapon", "id":wid, "title":f"{wid} +1"})
         else:
             if not weapons_full:
-                offers.append(Offer("weapon", wid, f"Get {wid}"))
+                offers.append({"kind":"weapon", "id":wid, "title":f"Get {wid}"})
 
-    all_attr_ids = ["elixir", "hook", "kubek_deluxe","lamp",  "ring", "scroll"]
+    all_attr_ids = ["elixir", "hook", "lamp",  "ring", "scroll"]
     for aid in all_attr_ids:
         if aid in p.attributes:
             if p.attributes[aid].can_level_up():
-                offers.append(Offer("attr", aid, f"{aid} +1"))
+                offers.append({"kind":"attr","id":aid,"title":f"{aid} +1"})
         else:
             if not attrs_full:
-                offers.append(Offer("attr", aid, f"Get {aid}"))
+                offers.append({"kind":"attr", "id":aid,"title":f"Get {aid}"})
 
     return offers
 
 
-def roll_3_offers(world) -> list[Offer]:
+def roll_offers(world:World.World,k:int) -> list[dict[str,str]]:
     pool = build_offers(world)
     if not pool:
         return []
-    return random.sample(pool, k=min(3, len(pool)))
+    return random.sample(pool, k=min(k, len(pool)))

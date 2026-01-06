@@ -2,13 +2,13 @@
   "magic_wand": {
     "name": "Magic Wand",
     "levels": [
-      { "damage": 10, "cooldown": 1.00, "amount": 1, "speed": 450, "pierce": 3 },
-      { "damage": 12, "cooldown": 0.95, "amount": 1, "speed": 470, "pierce": 3 },
-      { "damage": 14, "cooldown": 0.85, "amount": 2, "speed": 470, "pierce": 3 },
-      { "damage": 16, "cooldown": 0.85, "amount": 2, "speed": 470, "pierce": 4 },
-      { "damage": 18, "cooldown": 0.80, "amount": 2, "speed": 470, "pierce": 4 },
-      { "damage": 20, "cooldown": 0.80, "amount": 2, "speed": 470, "pierce": 4 },
-      { "damage": 25, "cooldown": 0.70, "amount": 2, "speed": 470, "pierce": 5 }
+      { "damage": 10, "cooldown": 1.00, "amount": 2, "speed": 450, "pierce": 3 },
+      { "damage": 12, "cooldown": 0.85, "amount": 1, "speed": 470, "pierce": 3 },
+      { "damage": 14, "cooldown": 0.75, "amount": 2, "speed": 470, "pierce": 3 },
+      { "damage": 16, "cooldown": 0.75, "amount": 2, "speed": 470, "pierce": 4 },
+      { "damage": 18, "cooldown": 0.65, "amount": 2, "speed": 470, "pierce": 4 },
+      { "damage": 20, "cooldown": 0.60, "amount": 2, "speed": 470, "pierce": 4 },
+      { "damage": 25, "cooldown": 0.60, "amount": 2, "speed": 470, "pierce": 5 }
     ]
   },
 
@@ -28,26 +28,26 @@
   "crossbow": {
     "name": "Crossbow",
     "levels": [
-      { "damage": 20, "cooldown": 2.00, "amount": 1, "speed": 380, "pierce": 5 },
-      { "damage": 24, "cooldown": 2.00, "amount": 1, "speed": 400, "pierce": 5 },
-      { "damage": 28, "cooldown": 1.90, "amount": 2, "speed": 420, "pierce": 6 },
-      { "damage": 28, "cooldown": 1.90, "amount": 2, "speed": 420, "pierce": 6 },
-      { "damage": 28, "cooldown": 1.80, "amount": 2, "speed": 420, "pierce": 7 },
-      { "damage": 28, "cooldown": 1.80, "amount": 2, "speed": 420, "pierce": 7 },
-      { "damage": 28, "cooldown": 1.70, "amount": 2, "speed": 420, "pierce": 8 }
+      { "damage": 30, "cooldown": 2.00, "amount": 2, "speed": 380, "pierce": 5 },
+      { "damage": 34, "cooldown": 2.00, "amount": 1, "speed": 400, "pierce": 5 },
+      { "damage": 38, "cooldown": 1.90, "amount": 2, "speed": 420, "pierce": 6 },
+      { "damage": 44, "cooldown": 1.90, "amount": 2, "speed": 420, "pierce": 6 },
+      { "damage": 44, "cooldown": 1.80, "amount": 2, "speed": 420, "pierce": 7 },
+      { "damage": 48, "cooldown": 1.80, "amount": 2, "speed": 420, "pierce": 7 },
+      { "damage": 58, "cooldown": 1.70, "amount": 2, "speed": 420, "pierce": 8 }
     ]
   },
 
   "sword": {
     "name": "Sword",
     "levels": [
-      { "damage": 18, "cooldown": 2, "amount": 1, "speed": 0,   "pierce": -1 },
-      { "damage": 22, "cooldown": 1.9, "amount": 1, "speed": 0,   "pierce": -1 },
-      { "damage": 26, "cooldown": 1.8, "amount": 1, "speed": 0,   "pierce": -1 },
-      { "damage": 26, "cooldown": 1.7, "amount": 1, "speed": 0,   "pierce": -1 },
-      { "damage": 26, "cooldown": 1.7, "amount": 1, "speed": 0,   "pierce": -1 },
-      { "damage": 26, "cooldown": 1.6, "amount": 1, "speed": 0,   "pierce": -1 },
-      { "damage": 26, "cooldown": 1.5, "amount": 1, "speed": 0,   "pierce": -1 }
+      { "damage": 18, "cooldown": 2, "amount": 1, "speed": 0,   "pierce": -100 },
+      { "damage": 22, "cooldown": 1.9, "amount": 1, "speed": 0,   "pierce": -100 },
+      { "damage": 26, "cooldown": 1.8, "amount": 1, "speed": 0,   "pierce": -100 },
+      { "damage": 26, "cooldown": 1.7, "amount": 1, "speed": 0,   "pierce": -100 },
+      { "damage": 26, "cooldown": 1.7, "amount": 1, "speed": 0,   "pierce": -100 },
+      { "damage": 26, "cooldown": 1.6, "amount": 1, "speed": 0,   "pierce": -100 },
+      { "damage": 26, "cooldown": 1.5, "amount": 1, "speed": 0,   "pierce": -100 }
     ]
   }
 }

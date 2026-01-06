@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 
+
+import World
+
 @dataclass
 class WeaponLevelStats:
     damage: int
@@ -12,7 +15,7 @@ class WeaponLevelStats:
 class BaseWeapon:
     id: str = "base"
     name: str = "Base Weapon"
-    def __init__(self,level_stats: list[WeaponLevelStats]):
+    def __init__(self,level_stats: list[WeaponLevelStats]) -> None:
         self._levels = level_stats
         self.level = 1
         self.max_level = len(level_stats)
@@ -38,7 +41,7 @@ class BaseWeapon:
             pierce=b.pierce + owner_stats.pierce_bonus,
         )
 
-    def update(self, dt: float, world, owner) -> None:
+    def update(self, dt, world, owner) -> None:
         self._cooldown_timer -= dt
         if self._cooldown_timer <= 0.0:
             self.fire(world, owner)

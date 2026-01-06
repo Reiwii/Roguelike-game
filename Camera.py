@@ -1,5 +1,6 @@
 import pygame
 import math
+import Player
 
 class Camera(pygame.sprite.Group):
     def __init__(self):
@@ -23,7 +24,7 @@ class Camera(pygame.sprite.Group):
         self.tiles = math.ceil(self.screen_width / self.ground_width)
 
 
-    def on_resize(self, screen):
+    def on_resize(self, screen:pygame.Surface)->None:
         self.display_surface = pygame.display.get_surface()
         self.screen_width, self.screen_height = self.display_surface.get_size()
 
@@ -34,7 +35,7 @@ class Camera(pygame.sprite.Group):
         self.camera_rect = pygame.Rect(l, t, w, h)
 
         self.tiles = math.ceil(self.screen_width / self.ground_width)
-    def box_target_camera(self,target):
+    def box_target_camera(self,target:Player.Player)->None:
         if target.rect.left < self.camera_rect.left:
             self.camera_rect.left = target.rect.left
         if target.rect.right > self.camera_rect.right:
@@ -54,7 +55,7 @@ class Camera(pygame.sprite.Group):
         self.offset.x = self.camera_rect.left - self.camera_borders['left']
         self.offset.y = self.camera_rect.top - self.camera_borders['top']
 
-    def custom_draw(self,player,surface):
+    def custom_draw(self,player:Player.Player,surface:pygame.Surface):
         self.box_target_camera(player)
         start_col = int(self.offset.x // self.ground_width)
         for x in range(start_col - 1, start_col + self.tiles + 2):

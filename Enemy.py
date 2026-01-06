@@ -57,8 +57,6 @@ class Enemy(sprite.Sprite):
         for i,frame in enumerate(cls.all_frames[24:30]):
             cls.all_frames[i] = pygame.transform.flip(frame,flip_x=True,flip_y=False)
 
-            
-       
         cls.animations = defaultdict(list)
         anim_frames = {
             'walk_side_right':cls.all_frames[24:30],
@@ -70,9 +68,6 @@ class Enemy(sprite.Sprite):
                 cls.animations[(anim,1)].append(frame)
                 cls.animations[(anim,2)].append(pygame.transform.scale_by(frame,2))
 
-        
-            
-        
     @staticmethod
     def slice_sheet(sheet,frame_w: int,frame_h: int) -> list[pygame.Surface]:
         sheet_w,sheet_h = sheet.get_size()
@@ -85,7 +80,7 @@ class Enemy(sprite.Sprite):
         return frames
 
 
-    def update(self,world:World,dt):
+    def update(self,world:World,dt:float):
         if self.action == "die":
             self.animate()
             return
@@ -115,7 +110,7 @@ class Enemy(sprite.Sprite):
 
     
     
-    def animate(self):
+    def animate(self)->None:
         self.frame_count += self.animation_speed
         if not self.is_boss:
             animation_list = self.animations[(self.action,self.scale)]
@@ -141,7 +136,7 @@ class Enemy(sprite.Sprite):
         return None
 
 
-    def take_damage(self, amount: int, world, source_pos, knockback=250):
+    def take_damage(self, amount: int, world, source_pos:pygame.Vector2, knockback=250):
         if self.action == "die":
             return
 

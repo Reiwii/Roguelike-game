@@ -8,7 +8,7 @@ class Shuriken(BaseWeapon):
     def __init__(self, level_stats: list[WeaponLevelStats]):
         super().__init__(level_stats)
 
-    def fire(self, world, owner):
+    def fire(self, world, owner)->None:
         stats = self.final_stats(owner.combat_stats)
 
         target = None
@@ -28,7 +28,9 @@ class Shuriken(BaseWeapon):
 
         tx, ty = target.rect.center
         dx, dy = tx - ox, ty - oy
-        length = math.hypot(dx, dy) or 1.0
+        length = math.hypot(dx, dy) 
+        if length == 0:
+            length = 1
         vx, vy = dx / length, dy / length
 
         base_vx,base_vy = vx * stats.speed, vy * stats.speed

@@ -40,6 +40,8 @@ class Game():
             if event.type == pygame.VIDEORESIZE:
                 self.screen = pygame.display.set_mode(event.size, pygame.RESIZABLE)
                 self.ui.on_resize(self.render_surface)
+                self.world.despawn_rect = pygame.Rect(self.player.pos.x,self.player.pos.y,self.screen.get_size()[0],self.screen.get_size()[1])
+                self.world.despawn_rect.inflate_ip(500,500)
 
             if event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION):
                 curr_screen_w, curr_screen_h = self.screen.get_size()
@@ -54,7 +56,7 @@ class Game():
             self.world.update(self.dt, self.camera)
         if self.world.player.leveled_up:
             self.world.player.leveled_up = False
-            offers = UI.roll_3_offers(self.world)
+            offers = UI.roll_offers(self.world,3)
             if offers:                      
                 self.ui.open_upgrade(offers)
             else:
@@ -69,7 +71,6 @@ class Game():
 
         pygame.display.flip()
 
-
     def run(self):
         while self.running:
             self.handle_events()
@@ -79,7 +80,6 @@ class Game():
             print(self.clock.get_fps())
 
         pygame.quit()
-
             
 if __name__ == "__main__":
     game = Game()

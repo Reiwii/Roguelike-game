@@ -36,8 +36,8 @@ class World:
         self.max_enemies = 200
         self.current_enemies = 0
 
-        self.base_spawn_interval = 2000   
-        self.min_spawn_interval  = 1000    
+        self.base_spawn_interval = 4000   
+        self.min_spawn_interval  = 2000    
         self.margin              = 150    
         self.number_of_spawned_waves = 0
 
@@ -138,7 +138,7 @@ class World:
         return max(interval, self.min_spawn_interval)
 
     def get_batch_size(self):
-        return 1 + self.enemies_killed // 20
+        return 2 + self.enemies_killed // 40
 
     def random_pos_outside_camera(self, camera):
         angle = random.random() * 2 * math.pi          
@@ -161,8 +161,8 @@ class World:
             return
 
         self.number_of_spawned_waves +=1
-        hp = 10+self.enemies_killed //10
-        if self.number_of_spawned_waves % 20 == 0:
+        hp = 20+self.enemies_killed //10
+        if self.number_of_spawned_waves % 30 == 0:
             x, y = self.random_pos_outside_camera(camera)
             Enemy.Enemy((x, y),True,hp+100, self.camera_group,
                         self.enemies_group, self.all_sprites_group)
@@ -231,7 +231,7 @@ class World:
                 out.extend(self.enemy_grid.get((cx + dx, cy + dy), []))
         return out
 
-    def spawn_projectile(self,  projectile_id, pos, vel=(0,0), damage=1, pierce=1, owner=None, lifetime=0.1):
+    def spawn_projectile(self,  projectile_id, pos, vel=(0,0), damage=1, pierce=1, owner=None, lifetime=0.2):
 
         if projectile_id == "missle":
             img = self.proj["missle"]

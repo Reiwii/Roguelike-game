@@ -7,7 +7,7 @@ class Sword(BaseWeapon):
     def __init__(self, level_stats):
         super().__init__(level_stats)
 
-    def fire(self, world, owner):
+    def fire(self, world, owner)->None:
         stats = self.final_stats(owner.combat_stats)
         ox, oy = owner.rect.center
 
